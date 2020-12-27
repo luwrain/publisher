@@ -28,24 +28,11 @@ import org.luwrain.app.base.*;
 
 public final class App extends AppBase<Strings>
 {
-    static final String LOG_COMPONENT = "notepad";
-    static private final String DEFAULT_CHARSET = "UTF-8";
-    static private final String NATURAL_MODE_CORRECTOR_HOOK = "luwrain.notepad.mode.natural";
-    static private final String PROGRAMMING_MODE_CORRECTOR_HOOK = "luwrain.notepad.mode.programming";
+    static final String LOG_COMPONENT = "publisher";
 
-    enum Mode { NONE, NATURAL, PROGRAMMING };
-
-    File file = null;
-    boolean modified = false;
-    String charset = DEFAULT_CHARSET;
-    String lineSeparator = System.lineSeparator();
-    Mode mode = Mode.NONE;
-    final EditUtils.ActiveCorrector corrector;
-    boolean speakIndent = false;
-
-    private FutureTask narratingTask = null; 
     private final String arg;
     private Conversations conv = null;
+    private AuthLayout authLayout = null;
     private MainLayout mainLayout = null;
 
     public App()
@@ -57,37 +44,15 @@ public final class App extends AppBase<Strings>
     {
 	super(Strings.NAME, Strings.class, "luwrain.notepad");
 	this.arg = arg;
-	this.corrector = new EditUtils.ActiveCorrector();
     }
 
     @Override public boolean onAppInit() throws IOException
     {
 	this.conv = new Conversations(getLuwrain(), getStrings());
 	this.mainLayout = new MainLayout(this);
+		this.authLayout = new AuthLayout(this);
 	setAppName(getStrings().appName());
 	return true;
-    }
-
-    boolean onInputEvent(Area area, InputEvent event, Runnable closing)
-    {
-	NullCheck.notNull(area, "area");
-	if (event.isSpecial())
-	    switch(event.getSpecial())
-	    {
-	    case ESCAPE:
-		if (closing != null)
-		    closing.run(); else
-		    closeApp();
-		return true;
-	    }
-	return super.onInputEvent(area, event);
-    }
-
-    @Override public boolean onInputEvent(Area area, InputEvent event)
-    {
-	NullCheck.notNull(area, "area");
-	NullCheck.notNull(event, "event");
-	return onInputEvent(area, event, null);
     }
 
     Conversations getConv()
@@ -97,7 +62,12 @@ public final class App extends AppBase<Strings>
 
     @Override public AreaLayout getDefaultAreaLayout()
     {
-	return mainLayout.getLayout();
+	return authLayout.getLayout();
     }
 
+    @Override public boolean onEscape(InputEvent event)
+    {
+	closeApp();
+	return true;
+    }
 }

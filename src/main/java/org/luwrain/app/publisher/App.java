@@ -46,23 +46,18 @@ public final class App extends AppBase<Strings>
 	this.arg = arg;
     }
 
-    @Override public boolean onAppInit() throws IOException
+    @Override public AreaLayout onAppInit() throws IOException
     {
 	this.conv = new Conversations(getLuwrain(), getStrings());
 	this.mainLayout = new MainLayout(this);
 		this.authLayout = new AuthLayout(this);
 	setAppName(getStrings().appName());
-	return true;
+	return authLayout.getLayout();
     }
 
     Conversations getConv()
     {
 	return this.conv;
-    }
-
-    @Override public AreaLayout getDefaultAreaLayout()
-    {
-	return authLayout.getLayout();
     }
 
     @Override public boolean onEscape(InputEvent event)
